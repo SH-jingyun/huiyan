@@ -6,6 +6,10 @@ use Core\Controller;
 
 Class UserController extends Controller {
 
+    /**
+     * 获取用户信息
+     * @return array|int
+     */
     public function infoAction () {
         if (!$this->params('oaid') && !$this->params('imei')) {
             return 202;
@@ -26,5 +30,36 @@ Class UserController extends Controller {
             return array('isVip' => 0, 'userStatus' => 1, 'accessToken' => $accessToken);
         }
     }
+
+    /**
+     * 获取订单号
+     */
+    public function orderAction () {
+        $token = $_SERVER['HTTP_ACCESSTOKEN'] ?? '';
+        if ($token) {
+            $sql = 'SELECT user_id FROM t_user WHERE access_token = ?';
+            $this->userId = $this->locator->db->getOne($sql, $token);
+        }
+        if (!$this->userId) {
+            return 201;
+        }
+        $amountArray = array('month' => 78, 'quarter' => 188, 'forever' => 298);
+        if (!in_array($this->params('vipType'), array_keys($amountArray))) {
+            return 202;
+        }
+        switch ($this->params('payMode')) {
+            case 'alipay':
+                $alipay = new \Core\Alipay();
+                $orderInfo = $alipay->unifiedorder($amountArray[$this->params('vipType')]);
+                break;
+            case 'wxpay':
+                return 202;
+                break;
+            default :
+                return 202;
+        }
+        return array('orderString' => $orderInfo['orderString']);
+    }
+
 }
 
