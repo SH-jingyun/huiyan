@@ -78,6 +78,14 @@ Class UserController extends Controller {
         }
         $alipay = new \Core\Alipay();
         $verifyFlag = $alipay->verify();
+        if (DEBUG_MODE) {
+            //add api log
+            $logFile = LOG_DIR . 'access/' . date('Ymd') . '/';
+            if (!is_dir($logFile)) {
+                mkdir($logFile, 0755, true);
+            }
+            file_put_contents($logFile . 'access_' . date('H') . '.log', json_encode($verifyFlag) . PHP_EOL, FILE_APPEND);
+        }
         if ($verifyFlag) {
             $sql = 'SELECT * FROM t_order WHERE order_number = ?';
             $orderInfo = $this->locator->db->getRow($sql, $_POST['out_trade_no']);

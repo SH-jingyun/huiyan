@@ -177,7 +177,6 @@ class Alipay {
    }
 
    public function verify () {
-        var_dump($_POST);
        return $this->aop->rsaCheckV1($_POST, NULL, "RSA2");
    }
 }
