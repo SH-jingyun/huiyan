@@ -177,6 +177,8 @@ class Alipay {
    }
 
    public function verify () {
+       $aop = new \AopClient ();
+       $aop->alipayrsaPublicKey='MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAorDAh6eMSXkLVDxuKoTfshJVj5hMd+HLaIaIm4YrTRPux/gegHmaTtwyM8PWFtXSriLabDTFpoZ/+S7ttQ6wzmYeFWgRukgQVtiMqt7sZUtsfjIhNo9Dasnzzv3y6Q5cFK9Rbj8zrx2xNbLL1TPYi/mZyXFX/7Sx/cF8MwExETKopzh+Tf9/etN3Xtra+8BADSpMHpgbPabR7tBezBYSzkz/OO9a1+ItVNlN1uoP22ZmMMt1bN1s3d/eOkWtbYnKVg1Q1drH5axsKZIItCqg6Yg9d/FMKw0I+3xe1r48CQVu4CwTF6i3EhXDj1cJi4jKE+yPeYMWYoNdh90FBVn9QQIDAQAB';
        return $this->aop->rsaCheckV1($_POST, NULL, "RSA2");
    }
 }
