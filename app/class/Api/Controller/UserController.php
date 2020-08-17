@@ -68,24 +68,8 @@ Class UserController extends Controller {
      * 接受支付宝支付成功回调
      */
     public function alipayAction () {
-        if (DEBUG_MODE) {
-            //add api log
-            $logFile = LOG_DIR . 'access/' . date('Ymd') . '/';
-            if (!is_dir($logFile)) {
-                mkdir($logFile, 0755, true);
-            }
-            file_put_contents($logFile . 'access_' . date('H') . '.log', date('Y-m-d H:i:s') . '|' . ($_SERVER['REQUEST_URI'] ?? '') . '|' . json_encode($_POST) . PHP_EOL, FILE_APPEND);
-        }
         $alipay = new \Core\Alipay();
         $verifyFlag = $alipay->verify();
-        if (DEBUG_MODE) {
-            //add api log
-            $logFile = LOG_DIR . 'access/' . date('Ymd') . '/';
-            if (!is_dir($logFile)) {
-                mkdir($logFile, 0755, true);
-            }
-            file_put_contents($logFile . 'access_' . date('H') . '.log', json_encode($verifyFlag) . PHP_EOL, FILE_APPEND);
-        }
         if ($verifyFlag) {
             $sql = 'SELECT * FROM t_order WHERE order_number = ?';
             $orderInfo = $this->locator->db->getRow($sql, $_POST['out_trade_no']);
@@ -100,7 +84,7 @@ Class UserController extends Controller {
                 $this->locator->db->exec($sql, $status, json_encode($_POST), $orderInfo['order_id']);
                 if ('success' == $status) {
                     $sql = 'SELECT vip_time FROM t_user WHERE user_id = ?';
-                    $userVipTime = $this->locator->db->getRow($sql, $orderInfo['user_id']);
+                    $userVipTime = $this->locator->db->getOne($sql, $orderInfo['user_id']);
                     $newVipTIme = date('Y-m-d', ($userVipTime ? strtotime($userVipTime) : time()) + $amountArray[$orderInfo['order_type']]['vip']);
 
                     $sql = 'UPDATE t_user SET vip_time = ? WHERE user_id = ?';
