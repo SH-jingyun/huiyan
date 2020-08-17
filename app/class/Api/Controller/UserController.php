@@ -43,7 +43,7 @@ Class UserController extends Controller {
         if (!$this->userId) {
             return 201;
         }
-        $amountArray = array('month' => 78, 'quarter' => 88, 'forever' => 188);
+        $amountArray = array('month' => 0.1, 'quarter' => 0.2, 'forever' => 0.3);
         if (!in_array($this->params('vipType'), array_keys($amountArray))) {
             return 202;
         }
@@ -85,9 +85,9 @@ Class UserController extends Controller {
                 $amountArray = array('month' => array('vip' => 2592000, 'value' => 78), 'quarter' => array('vip' => 7776000, 'value' => 88), 'forever' => array('vip' => 311040000, 'value' => 188));// 78 一个月 88 三个月 188 10年
 
                 $status = in_array($_POST['trade_status'], array('TRADE_FINISHED', 'TRADE_SUCCESS')) ? 'success' : 'failure';
-                if ($amountArray[$orderInfo['order_type']]['value'] != $_POST['total_amount']) {
-                    $status = 'failure';
-                }
+//                if ($amountArray[$orderInfo['order_type']]['value'] != $_POST['total_amount']) {
+//                    $status = 'failure';
+//                }
                 $sql = 'UPDATE t_order SET order_status = ?, pay_data = ? WHERE order_id = ?';
                 $this->locator->db->exec($sql, $status, json_encode($_POST), $orderInfo['order_id']);
                 if ('success' == $status) {
