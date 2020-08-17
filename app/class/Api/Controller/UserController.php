@@ -68,6 +68,14 @@ Class UserController extends Controller {
      * 接受支付宝支付成功回调
      */
     public function alipayAction () {
+        if (DEBUG_MODE) {
+            //add api log
+            $logFile = LOG_DIR . 'access/' . date('Ymd') . '/';
+            if (!is_dir($logFile)) {
+                mkdir($logFile, 0755, true);
+            }
+            file_put_contents($logFile . 'access_' . date('H') . '.log', date('Y-m-d H:i:s') . '|' . ($_SERVER['REQUEST_URI'] ?? '') . '|' . json_encode($_POST) . PHP_EOL, FILE_APPEND);
+        }
         $alipay = new \Core\Alipay();
         $verifyFlag = $alipay->verify();
         if ($verifyFlag) {
@@ -92,7 +100,6 @@ Class UserController extends Controller {
                     //order_value
                 }
                 die('success');
-
             }
         }
         die('failure');
