@@ -43,10 +43,11 @@ Class UserController extends Controller {
         if (!$this->userId) {
             return 201;
         }
-        $amountArray = array('month' => 78, 'quarter' => 188, 'forever' => 298);
+        $amountArray = array('month' => 78, 'quarter' => 88, 'forever' => 188);
         if (!in_array($this->params('vipType'), array_keys($amountArray))) {
             return 202;
         }
+        // 添加支付信息到数据库
         switch ($this->params('payMode')) {
             case 'alipay':
                 $alipay = new \Core\Alipay();
@@ -58,7 +59,43 @@ Class UserController extends Controller {
             default :
                 return 202;
         }
+        $sql = 'INSERT INTO t_order (user_id, order_number, order_value, order_mode, order_type) SELECT :user_id, :order_number, :order_value, :order_mode, :order_type FROM DUAL WHERE NOT EXISTS (SELECT order_id FROM t_order WHERE order_number = :order_number)';
+        $this->locator->db->exec($sql, array('user_id' => $this->userId, 'order_number' => $orderInfo['orderNo'], 'order_value' => $amountArray[$this->params('vipType')], 'order_mode' => $this->params('payMode'), 'order_type' => $this->params('vipType')));
         return array('orderString' => $orderInfo['orderString']);
+    }
+
+    /**
+     * 接受支付宝支付成功回调
+     */
+    public function alipayAction () {
+        $alipay = new \Core\Alipay();
+        $verifyFlag = $alipay->verify();
+        if ($verifyFlag) {
+            $sql = 'SELECT * FROM t_order WHERE order_number = ?';
+            $orderInfo = $this->locator->db->getRow($sql, $_POST['out_trade_no']);
+            if ($orderInfo && ('pending' == $orderInfo['order_status'])) {
+                $amountArray = array('month' => array('vip' => 2592000, 'value' => 78), 'quarter' => array('vip' => 7776000, 'value' => 88), 'forever' => array('vip' => 311040000, 'value' => 188));// 78 一个月 88 三个月 188 10年
+
+                $status = in_array($_POST['trade_status'], array('TRADE_FINISHED', 'TRADE_SUCCESS')) ? 'success' : 'failure';
+                if ($amountArray[$orderInfo['order_type']]['value'] != $_POST['total_amount']) {
+                    $status = 'failure';
+                }
+                $sql = 'UPDATE t_order SET order_status = ?, pay_data = ? WHERE order_id = ?';
+                $this->locator->db->exec($sql, $status, json_encode($_POST), $orderInfo['order_id']);
+                if ('success' == $status) {
+                    $sql = 'SELECT vip_time FROM t_user WHERE user_id = ?';
+                    $userVipTime = $this->locator->db->getRow($sql, $orderInfo['user_id']);
+                    $newVipTIme = date('Y-m-d', ($userVipTime ? strtotime($userVipTime) : time()) + $amountArray[$orderInfo['order_type']]['vip']);
+
+                    $sql = 'UPDATE t_user SET vip_time = ? WHERE user_id = ?';
+                    $this->locator->db->exec($sql, $newVipTIme, $orderInfo['user_id']);
+                    //order_value
+                }
+                die('success');
+
+            }
+        }
+        die('failure');
     }
 
 }
