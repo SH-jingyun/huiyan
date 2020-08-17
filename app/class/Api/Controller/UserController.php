@@ -85,7 +85,7 @@ Class UserController extends Controller {
                 if ('success' == $status) {
                     $sql = 'SELECT vip_time FROM t_user WHERE user_id = ?';
                     $userVipTime = $this->locator->db->getOne($sql, $orderInfo['user_id']);
-                    $newVipTIme = date('Y-m-d', (('0000-00-00 00:00:00' != $userVipTime) ? strtotime($userVipTime) : time()) + $amountArray[$orderInfo['order_type']]['vip']);
+                    $newVipTIme = date('Y-m-d H:i:s', (('0000-00-00 00:00:00' != $userVipTime) ? strtotime($userVipTime) : time()) + $amountArray[$orderInfo['order_type']]['vip']);
 
                     $sql = 'UPDATE t_user SET vip_time = ? WHERE user_id = ?';
                     $this->locator->db->exec($sql, $newVipTIme, $orderInfo['user_id']);
