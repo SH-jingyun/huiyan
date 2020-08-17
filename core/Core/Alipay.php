@@ -9,11 +9,11 @@ require_once CORE_DIR . 'Core/alipay/request/AlipayTradeAppPayRequest.php';
 
 class Alipay {
     protected $aop;
-    protected $callback = 'http://jytest.darkness.ltd:8006/user/aliapy/';
+    protected $callback = 'http://jytest.darkness.ltd:8006/user/aliapy';
 
     public function __construct () {
         if (ENV_PRODUCTION) {
-            $this->callback = 'http://jytest.darkness.ltd:8006/user/aliapy/';
+            $this->callback = 'http://jytest.darkness.ltd:8006/user/aliapy';
         }
         $aop = new \AopClient ();
         $aop->gatewayUrl = 'https://openapi.alipay.com/gateway.do';
