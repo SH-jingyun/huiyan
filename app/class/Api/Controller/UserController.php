@@ -43,7 +43,7 @@ Class UserController extends Controller {
         if (!$this->userId) {
             return 201;
         }
-        $amountArray = array('month' => 0.1, 'quarter' => 0.2, 'forever' => 0.3);
+        $amountArray = array('month' => 78, 'quarter' => 88, 'forever' => 188);
         if (!in_array($this->params('vipType'), array_keys($amountArray))) {
             return 202;
         }
