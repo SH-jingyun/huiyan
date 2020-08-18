@@ -13,7 +13,7 @@ class Alipay {
 
     public function __construct () {
         if (ENV_PRODUCTION) {
-            $this->callback = 'http://jytest.darkness.ltd:8006/user/alipay';
+            $this->callback = 'https://hy.stepcounter.cn:4420/user/alipay';
         }
         $aop = new \AopClient ();
         $aop->gatewayUrl = 'https://openapi.alipay.com/gateway.do';
