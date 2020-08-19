@@ -101,6 +101,7 @@ Class UserController extends Controller {
      * 保存用户app list
      */
     public function appListAction () {
+
         $token = $_SERVER['HTTP_ACCESSTOKEN'] ?? '';
         if ($token) {
             $sql = 'SELECT user_id FROM t_user WHERE access_token = ?';
