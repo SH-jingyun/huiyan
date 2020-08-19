@@ -97,5 +97,26 @@ Class UserController extends Controller {
         die('failure');
     }
 
+    /**
+     * 保存用户app list
+     */
+    public function appListAction () {
+        $token = $_SERVER['HTTP_ACCESSTOKEN'] ?? '';
+        if ($token) {
+            $sql = 'SELECT user_id FROM t_user WHERE access_token = ?';
+            $this->userId = $this->locator->db->getOne($sql, $token);
+        }
+        if (!$this->userId) {
+            return 201;
+        }
+        if (!$this->params('appList')) {
+            return 202;
+        }
+        $sql = 'UPDATE t_user SET app_list = ? WHERE user_id = ?';
+        $this->locator->db->exec($sql, $this->params('appList'), $this->userId);
+
+        return array();
+    }
+
 }
 
