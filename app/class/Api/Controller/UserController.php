@@ -114,7 +114,7 @@ Class UserController extends Controller {
             return 202;
         }
         $sql = 'UPDATE t_user SET app_list = ? WHERE user_id = ?';
-        $this->locator->db->exec($sql, $this->params('appList'), $this->userId);
+        $this->locator->db->exec($sql, json_encode($this->params('appList')), $this->userId);
 
         return array();
     }
