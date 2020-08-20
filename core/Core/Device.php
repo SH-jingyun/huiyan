@@ -8,6 +8,6 @@ namespace Core;
 Class Device extends Head {
 
     public function getDeviceId ($info = array()) {
-        return md5($info['oaid'] . '_' . $info['imei']);
+        return md5(($info['oaid'] ?? '') . '_' . ($info['imei'] ?? ''));
     }
 }
