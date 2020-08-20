@@ -26,7 +26,7 @@ Class UserController extends Controller {
             $accessToken = md5($deviceId . time());
             $reyunAppName = $this->reyunAppName($this->params('imei'), $this->params('oaid'), $this->params('androidid'));
 
-            $sql = 'INSERT INTO t_user (user_source, device_id, access_token, oaid, imei, androidid, mac, brand, model, reyun_app_name, compaign_id) SELECT :user_source, :device_id, :access_token, :oaid, :imei, :mac, :brand, :model FROM DUAL WHERE NOT EXISTS (SELECT user_id FROM t_user WHERE device_id = :device_id)';
+            $sql = 'INSERT INTO t_user (user_source, device_id, access_token, oaid, imei, androidid, mac, brand, model, reyun_app_name, compaign_id) SELECT :user_source, :device_id, :access_token, :oaid, :imei, :mac, :brand, :model, :reyun_app_name, :compaign_id FROM DUAL WHERE NOT EXISTS (SELECT user_id FROM t_user WHERE device_id = :device_id)';
             $this->locator->db->exec($sql, array('user_source' => $this->params('source'), 'device_id' => $deviceId, 'access_token' => $accessToken, 'oaid' => $this->params('oaid'), 'imei' => $this->params('imei'), 'androidid' => $this->params('androidid'), 'mac' => $this->params('mac'), 'brand' => $this->params('brand'), 'model' => $this->params('model'), 'reyun_app_name' => $reyunAppName['app_name'] ?? '', 'compaign_id' => $reyunAppName['compaign_id'] ?? ''));
 
             $userId = $this->locator->db->lastInsertId();
