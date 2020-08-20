@@ -26,7 +26,7 @@ switch ($params['_type']) {
             //opt 返回错误码msg列表
             //2** 通用错误 3** home 4** bouns 5** my 6** system
             //201 token 错误  202 访问错误  203 认证失败
-            $array = array(201 => '无效token', 202 => '访问失败，请稍后再试', 203 => '访问失败，请稍后再试', 204 => '抱歉您的账户已被冻结');
+            $array = array(201 => '无效token', 202 => '访问失败，请稍后再试', 203 => '访问失败，请稍后再试', 204 => '抱歉您的账户已被冻结', 301 => '您已经是永久vip');
             $return = array('code' => $result, 'data' => (object) array(), 'msg' => $array[$result] ?? '');
         }
         if (DEBUG_MODE) {
