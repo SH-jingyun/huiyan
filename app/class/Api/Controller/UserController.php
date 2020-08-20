@@ -29,11 +29,11 @@ Class UserController extends Controller {
             $sql = 'INSERT INTO t_user (user_source, device_id, access_token, oaid, imei, androidid, mac, brand, model, reyun_app_name, compaign_id) SELECT :user_source, :device_id, :access_token, :oaid, :imei, :mac, :brand, :model FROM DUAL WHERE NOT EXISTS (SELECT user_id FROM t_user WHERE device_id = :device_id)';
             $this->locator->db->exec($sql, array('user_source' => $this->params('source'), 'device_id' => $deviceId, 'access_token' => $accessToken, 'oaid' => $this->params('oaid'), 'imei' => $this->params('imei'), 'androidid' => $this->params('androidid'), 'mac' => $this->params('mac'), 'brand' => $this->params('brand'), 'model' => $this->params('model'), 'reyun_app_name' => $reyunAppName['app_name'] ?? '', 'compaign_id' => $reyunAppName['compaign_id'] ?? ''));
 
-            $userId = $this->db->lastInsertId();
+            $userId = $this->locator->db->lastInsertId();
 
             if (isset($reyunAppName['log_id'])) {
                 $sql = 'UPDATE t_reyun_log SET user_id = ? WHERE log_id = ?';
-                $this->db->exec($sql, $userId, $reyunAppName['log_id']);
+                $this->locator->db->exec($sql, $userId, $reyunAppName['log_id']);
             }
             return array('isVip' => 0, 'userStatus' => 1, 'accessToken' => $accessToken);
         }
@@ -135,15 +135,15 @@ Class UserController extends Controller {
 
     public function reyunAppName ($imie, $oaid, $androidid) {
         $sql = 'SELECT log_id, app_name, compaign_id FROM t_reyun_log WHERE imei = ?';
-        $appName = $this->db->getRow($sql, $imie);
+        $appName = $this->locator->db->getRow($sql, $imie);
         if ($appName) {
             return $appName;
         }
-        $appName = $this->db->getRow($sql, $oaid);
+        $appName = $this->locator->db->getRow($sql, $oaid);
         if ($appName) {
             return $appName;
         }
-        $appName = $this->db->getRow($sql, $androidid);
+        $appName = $this->locator->db->getRow($sql, $androidid);
         if ($appName) {
             return $appName;
         }
