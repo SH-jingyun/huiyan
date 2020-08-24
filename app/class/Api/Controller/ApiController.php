@@ -38,24 +38,24 @@ Class ApiController extends Controller {
                 return json_encode($return);
             }
 //            $sql = 'SELECT user_id FROM t_user WHERE imei = ?';
-//            $userId = $this->db->getOne($sql, $_GET['imei']);
+//            $userId = $this->locator->db->getOne($sql, $_GET['imei']);
 //            if (!$userId) {
 //                $sql = 'INSERT INTO t_reyun_log SET imei = ?, app_name = ?, params = ?';
-//                $this->db->exec($sql, $_GET['imei'], $_GET['spreadname'], json_encode($_GET));
+//                $this->locator->db->exec($sql, $_GET['imei'], $_GET['spreadname'], json_encode($_GET));
 //                $return = array('code' => '803', 'msg' => '无效用户');
 //                return json_encode($return);
 //            }
 
             $sql = 'INSERT INTO t_reyun_log SET imei = ?, app_name = ?, params = ?, compaign_id = ?';
-            $this->db->exec($sql, $_GET['imei'], $_GET['spreadname'], json_encode($_GET), $_GET['_ry_adplan_id'] ?? 0);
-            $logId = $this->db->lastInsertId();
+            $this->locator->db->exec($sql, $_GET['imei'], $_GET['spreadname'], json_encode($_GET), $_GET['_ry_adplan_id'] ?? 0);
+            $logId = $this->locator->db->lastInsertId();
             $sql = 'SELECT user_id FROM t_user WHERE imei = ? OR oaid = ? OR androidid = ?';
-            $userId = $this->db->getOne($sql, $_GET['imei'], $_GET['imei'], $_GET['imei']);
+            $userId = $this->locator->db->getOne($sql, $_GET['imei'], $_GET['imei'], $_GET['imei']);
             if ($userId) {
                 $sql = 'UPDATE t_user SET reyun_app_name = ?, compaign_id = ? WHERE user_id = ?';
-                $this->db->exec($sql, $_GET['spreadname'], $_GET['_ry_adplan_id'] ?? 0, $userId);
+                $this->locator->db->exec($sql, $_GET['spreadname'], $_GET['_ry_adplan_id'] ?? 0, $userId);
                 $sql = 'UPDATE t_reyun_log SET user_id = ? WHERE log_id = ?';
-                $this->db->exec($sql, $userId, $logId);
+                $this->locator->db->exec($sql, $userId, $logId);
             }
             $return = array('code' => '200', 'msg' => '保存成功');
             return json_encode($return);
