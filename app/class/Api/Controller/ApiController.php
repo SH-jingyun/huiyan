@@ -24,7 +24,7 @@ Class ApiController extends Controller {
 //            file_put_contents($logFile . 'access_' . date('H') . '.log', date('Y-m-d H:i:s') . '|reyun|' . json_encode($_GET) . '|' . PHP_EOL, FILE_APPEND);
 //        }
         if (isset($_GET['spreadname']) && isset($_GET['imei']) && isset($_GET['appkey']) && isset($_GET['skey']) && isset($_GET['activetime'])) {
-            if ('bec5fa78bd65aff94ca5d775df4ad294' != $_GET['appkey']) {
+            if ('caaa89445d1922dcbba2e6e5be0896f0' != $_GET['appkey']) {
                 $return = array('code' => '802', 'msg' => '验证appkey失败');
                 return json_encode($return);
             }
