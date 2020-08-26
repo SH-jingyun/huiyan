@@ -1,6 +1,6 @@
 <?php
 // 统计用户app列表
-require_once '../init.inc.php';
+require_once __DIR__ . '/../init.inc.php';
 
 $sql = 'UPDATE t_app_list SET app_count = 0';
 $locator->db->exec($sql);
@@ -13,17 +13,20 @@ while(true) {
         break;
     }
     foreach ($appList as $appInfo) {
-        $app = json_decode($appInfo);
-//        var_dump($app);
-        foreach ($app as $val) {
-            $sql = 'SELECT * FROM t_app_list WHERE app_packname = ?';
-            $appReport = $locator->db->getRow($sql, );
-            if ($appReport) {
-                $sql = 'UPDATE t_app_list SET app_count = ? WHERE app_packname = ?';
-                $locator->db->exec($sql, $appReport['app_count'] + 1, );
-            } else {
-                $sql = 'INSERT INTO t_app_list SET app_count = ? WHERE app_packname = ?';
-                $locator->db->exec($sql, 1, );
+        if ($appInfo['app_list']) {
+            $app = json_decode($appInfo['app_list']);
+//            var_dump($app);
+//            exit;
+            foreach ($app as $val) {
+                $sql = 'SELECT * FROM t_app_list WHERE app_packname = ?';
+                $appReport = $locator->db->getRow($sql, $val->packageName);
+                if ($appReport) {
+                    $sql = 'UPDATE t_app_list SET app_count = ? WHERE app_packname = ?';
+                    $locator->db->exec($sql, $appReport['app_count'] + 1, $val->packageName);
+                } else {
+                    $sql = 'INSERT INTO t_app_list SET app_count = ?, app_packname = ?, app_name = ?';
+                    $locator->db->exec($sql, 1, $val->packageName, $val->appName);
+                }
             }
         }
         $userId = $appInfo['user_id'];
