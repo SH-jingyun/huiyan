@@ -165,7 +165,7 @@ Class UserController extends Controller {
             foreach ($post_data as $key => $value) {
                 $strArr[] = $key . '=' . $value;
             }
-            $strArr[] = 'key=' . $this->key;
+            $strArr[] = 'key=' . WECHAT_KEY;
             $newSign = strtoupper(md5(implode('&', $strArr)));
 
             //签名统一，则更新数据库

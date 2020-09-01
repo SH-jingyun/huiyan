@@ -14,9 +14,9 @@ Class Wxpay
         if (ENV_PRODUCTION) {
             $this->callback = 'https://hy.stepcounter.cn:4420/user/wxpay';
         }
-        $this->appId = 'wx0d37ff9a3e588e06';//申请商户号的appid或商户号绑定的appid
-        $this->id = '1578227681';//微信支付分配的商户号
-        $this->key = '23a365d18f89691ad645049f67d8064e';
+        $this->appId = WECHAT_APPID;//申请商户号的appid或商户号绑定的appid
+        $this->id = WECHAT_ID;//微信支付分配的商户号
+        $this->key = WECHAT_KEY;
     }
 
     public function unifiedorder ($amount, $orderNumber = '') {

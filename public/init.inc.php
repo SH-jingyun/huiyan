@@ -39,6 +39,12 @@ if (file_exists(CONFIG_DIR . 'config.private.php')) {
 !defined('PAY_MODE') && define('PAY_MODE', FALSE);
 !defined('DEBUG_MODE') && define('DEBUG_MODE', FALSE);
 
+//wechat config start
+!defined('WECHAT_APPID') && define('WECHAT_APPID', '');//申请商户号的appid或商户号绑定的appid
+!defined('WECHAT_ID') && define('WECHAT_ID', '');//微信支付分配的商户号
+!defined('WECHAT_KEY') && define('WECHAT_KEY', '');
+//wechat config end
+
 
 /**
  * register autoload
