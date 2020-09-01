@@ -68,7 +68,11 @@ Class UserController extends Controller {
                 $orderInfo = $alipay->unifiedorder($amountArray[$this->params('vipType')]);
                 break;
             case 'wxpay':
-                return 202;
+                $wxpay = new \Core\Wxpay();
+                $orderInfo = $wxpay->unifiedorder($amountArray[$this->params('vipType')]);
+                if (!is_array($orderInfo)) {
+                    return 202;
+                }
                 break;
             default :
                 return 202;
@@ -109,6 +113,87 @@ Class UserController extends Controller {
             }
         }
         die('failure');
+    }
+
+    /**
+     * 接受微信支付成功回调
+     */
+    public function wxpayAction () {
+        $alipay = new \Core\Wxpay();
+
+        $post = file_get_contents("php://input");
+        libxml_disable_entity_loader(true); //禁止引用外部xml实体
+        $xml = simplexml_load_string($post, 'SimpleXMLElement', LIBXML_NOCDATA);//XML转数组
+        $post_data = (array)$xml;
+        /** 解析出来的数组
+         *Array
+         * (
+         * [appid] => wx1c870c0145984d30
+         * [bank_type] => CFT
+         * [cash_fee] => 100
+         * [fee_type] => CNY
+         * [is_subscribe] => N
+         * [mch_id] => 1297210301
+         * [nonce_str] => gkq1x5fxejqo5lz5eua50gg4c4la18vy
+         * [openid] => olSGW5BBvfep9UhlU40VFIQlcvZ0
+         * [out_trade_no] => fangchan_588796
+         * [result_code] => SUCCESS
+         * [return_code] => SUCCESS
+         * [sign] => F6890323B0A6A3765510D152D9420EAC
+         * [time_end] => 20180626170839
+         * [total_fee] => 100
+         * [trade_type] => JSAPI
+         * [transaction_id] => 4200000134201806265483331660
+         * )
+         **/
+        //订单号
+        $out_trade_no = isset($post_data['out_trade_no']) && !empty($post_data['out_trade_no']) ? $post_data['out_trade_no'] : 0;
+
+        //查询订单信息
+        $sql = 'SELECT * FROM t_order WHERE order_number = ?';
+        $orderInfo = $this->locator->db->getRow($sql, $out_trade_no);
+
+        if($orderInfo){
+            //接收到的签名
+            $post_sign = $post_data['sign'];
+            unset($post_data['sign']);
+
+            //重新生成签名
+
+            $strArr = array();
+            ksort($post_data);
+            foreach ($post_data as $key => $value) {
+                $strArr[] = $key . '=' . $value;
+            }
+            $strArr[] = 'key=' . $this->key;
+            $newSign = strtoupper(md5(implode('&', $strArr)));
+
+            //签名统一，则更新数据库
+            if($post_sign == $newSign) {
+                if ($orderInfo && ('pending' == $orderInfo['order_status'])) {
+                    $amountArray = array('month' => array('vip' => 2592000, 'value' => 78), 'quarter' => array('vip' => 7776000, 'value' => 88), 'forever' => array('vip' => 311040000, 'value' => 188));// 78 一个月 88 三个月 188 10年
+
+                    $status = $post_data['result_code'];//SUCCESS/FAIL
+//                if ($amountArray[$orderInfo['order_type']]['value'] != $post_data['total_fee']) {//total_fee 订单总金额，单位为分
+//                    $status = 'failure';
+//                }
+                    $sql = 'UPDATE t_order SET order_status = ?, pay_data = ? WHERE order_id = ?';
+                    $this->locator->db->exec($sql, $status, json_encode($post_data), $orderInfo['order_id']);
+                    if ('success' == $status) {
+                        $sql = 'SELECT vip_time FROM t_user WHERE user_id = ?';
+                        $userVipTime = $this->locator->db->getOne($sql, $orderInfo['user_id']);
+                        $newVipTIme = date('Y-m-d H:i:s', (('0000-00-00 00:00:00' != $userVipTime) ? strtotime($userVipTime) : time()) + $amountArray[$orderInfo['order_type']]['vip']);
+
+                        $sql = 'UPDATE t_user SET vip_time = ? WHERE user_id = ?';
+                        $this->locator->db->exec($sql, $newVipTIme, $orderInfo['user_id']);
+                        //order_value
+                    }
+                }
+            }
+        }
+        //阻止微信接口反复回调接口  文档地址 https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=9_7&index=7，下面这句非常重要!!!
+        $str='<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+        die($str);
     }
 
     /**
