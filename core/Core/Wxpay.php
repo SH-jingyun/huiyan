@@ -59,7 +59,7 @@ Class Wxpay
         if ($return_xml) {
             libxml_disable_entity_loader(true);//禁止引用外部xml实体
             $value_array = json_decode(json_encode(simplexml_load_string($return_xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);//先把xml转换为simplexml对象，再把simplexml对象转换成 json，再将 json 转换成数组。
-            var_dump($value_array);
+//            var_dump($value_array);
             if (isset($value_array['err_code'])) {
                 return $value_array['err_code'] . ':' . ($value_array['err_code_des'] ?? '');
             } else {
