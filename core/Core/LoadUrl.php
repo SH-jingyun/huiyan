@@ -10,10 +10,12 @@ Class LoadUrl extends Head {
             if (method_exists($controller, $actionName)) {
                 return $controller->$actionName();
             } else {
-                throw new \Exception(sprintf('Invaild Action %s', $actionName));//opt 跳转404
+                http_response_code(404);
+                exit;
             }
         } else {
-            throw new \Exception(sprintf('Invaild Controller %s', $controllerName));//opt 跳转404
+            http_response_code(404);
+            exit;
         }
     }
 }

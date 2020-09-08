@@ -21,7 +21,8 @@ Class Func {
                     $action = $routerArr[2] . 'Action';
                     $type = 'admin';
                 } else {
-                    throw new \Exception(sprintf('Error url %s', $requestUrl));//opt 跳转404
+                    http_response_code(404);
+                    exit;
                 }
                 break;
             //api
@@ -29,12 +30,11 @@ Class Func {
                 $controller = 'Api\\Controller\\' . ucfirst($routerArr[0]) . 'Controller';
                 $action = $routerArr[1] . 'Action';
                 $type = 'api';
-//                var_dump(file_get_contents("php://input"));
-//                var_dump(json_decode(file_get_contents("php://input"), TRUE));
                 $params = json_decode(file_get_contents("php://input"), TRUE) ?: array();
                 break;
             default:
-                throw new \Exception(sprintf('Error url %s', $requestUrl));//opt 跳转404
+                http_response_code(404);
+                exit;
         }
         return array_merge($params, array(
             '_controller' => $controller,
